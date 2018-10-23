@@ -23,19 +23,25 @@ public class SocketThread implements Runnable {
             Socket socket = serverSocket.accept();
             // 从Socket当中得到InputStream对象
             InputStream inputStream = socket.getInputStream();
-            byte buffer[] = new byte[1024 * 4];
+            byte buffer[] = new byte[1024 ];
             int temp = 0;
+            StringBuilder rev=new StringBuilder(2048);
             // 从InputStream当中读取客户端所发送的数据
-            while ((temp = inputStream.read(buffer)) != -1) {
-                System.out.println(new String(buffer, 0, temp));
+            while ((temp = inputStream.read(buffer)) != -1 ) {
+                rev.append(new String(buffer, 0, temp));
             }
-            WeiboApplication i=new WeiboApplication();
-            String ret=i.newCalculateS("test");
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(ret.getBytes());
-            // 发送读取的数据到服务端
-            outputStream.flush();
 
+            if(rev!=null && rev.indexOf("uid:")!=-1) {
+
+                String uid=rev.substring(rev.indexOf("uid:")+4,rev.indexOf(";"));
+
+                WeiboApplication i = new WeiboApplication();
+                String ret = "ret:" + i.newCalculateS("5l0WXnhiY4pJ794KIJ7Rw5F45VXg9sjo"+uid) + ";";
+                OutputStream outputStream = socket.getOutputStream();
+                outputStream.write(ret.getBytes());
+                // 发送读取的数据到服务端
+                outputStream.flush();
+            }
             serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
